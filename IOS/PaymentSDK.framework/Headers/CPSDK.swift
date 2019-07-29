@@ -45,7 +45,10 @@ import UIKit
 }
 
 @objc public class CPSDK: NSObject {
+    @objc var thmProfileController : THMProfileController!
     @objc public init(withApiKey apiKey:String, andEnvironment environment:Environment) {
+        thmProfileController = THMProfileController();
+        thmProfileController.doProfile()
         self._environment = environment
         ConfigurationManager.shared.apiKey = apiKey
     }
@@ -59,11 +62,13 @@ import UIKit
     
     @objc public func manualEnrollment(withCpSdkConfiguration cpSdkConfiguration:CPSdkConfiguration, andManualEnrollmentConfiguration manualEnrollmentConfiguration:ManualEnrollmentConfiguration) -> ManualEnrollment? {
         cpSdkConfiguration._environment = self._environment
+        manualEnrollmentConfiguration.sessionId = thmProfileController.sessionID
         return ManualEnrollment(cpSdkConfiguration: cpSdkConfiguration, manualEnrollmentConfiguration: manualEnrollmentConfiguration)
     }
     
     @objc public func updateEnrollment(withCpSdkConfiguration cpSdkConfiguration:CPSdkConfiguration, andUpdateEnrollmentConfiguration updateEnrollmentConfiguration:ManualEnrollmentConfiguration) -> UpdateEnrollment? {
         cpSdkConfiguration._environment = self._environment
+        updateEnrollmentConfiguration.sessionId = thmProfileController.sessionID
         return UpdateEnrollment(cpSdkConfiguration: cpSdkConfiguration, updateEnrollmentConfiguration: updateEnrollmentConfiguration)
     }
     
@@ -94,8 +99,7 @@ public class BaseCPFlow: NSObject {
     private var completionHandler: (([String : AnyObject]?) -> Void)?
     //MARK: Initializers
     public override init() {
-        super.init()
-        
+        super.init()        
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "PaymentSdkStopSession"), object: nil, queue: OperationQueue.main) { (notification: Notification) in
             if self.completionHandler != nil {
                 if let response = notification.userInfo as? [String : AnyObject] {
@@ -125,6 +129,15 @@ public class BaseCPFlow: NSObject {
     //MARK: Base entry and exit points for flows
     @objc public func start(completionHandler: @escaping ([String : AnyObject]?) -> Void) {
         self.completionHandler = completionHandler
+        guard self.cpSdkConfiguration.postUrl != nil, self.cpSdkConfiguration.postUrl != "" else {
+            var failureDict = [String: AnyObject]()
+            failureDict["transactionStatus"] = "ERROR" as AnyObject
+            failureDict["transactionStatusCode"] = String(CPErrorCode.postUrlMissing.rawValue) as AnyObject
+            failureDict["transactionStatusDescription"] = CPErrorMessage.missingRedirectionURL as AnyObject
+            failureDict["responseVerbiage"] = CPErrorMessage.missingRedirectionURL as AnyObject
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "PaymentSdkStopSession"), object: nil, userInfo: failureDict)
+            return
+        }
         var viewControllerToPresent: BaseViewController?
         ConfigurationManager.shared.sdkConstants = cpSdkConfiguration
         switch ConfigurationManager.shared.cpSdkFlow {
@@ -194,10 +207,30 @@ public class BaseCPFlow: NSObject {
                         if displayWidgetType == .CPEnrollmentAccountDetailsWidget {
                             configurationVC.mergeDictionaries()
                         }
-                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "DidLoadConfiguration"), object: nil)
+                        
+                        // Remove any extra values from dataDictionary that don't exist in the configuration object
+                        var filteredDictionary = [String:String]()
+                        ConfigurationManager.shared.mainScreenConfiguration?.widgets.forEach({ (key, widget) in
+                            widget.flatFields.forEach({ (fieldConfiguration) in
+                                configurationVC.dataDictionary.forEach({ (key, value) in
+                                    var components = key.components(separatedBy: ".")
+                                    components.removeFirst()
+                                    let dictId = components.joined(separator: ".")
+                                    if dictId == fieldConfiguration.id {
+                                        filteredDictionary[key] = value
+                                    }
+                                })
+                            })
+                        })
+                        
+                        configurationVC.dataDictionary = filteredDictionary
+                        
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "DidLoadConfiguration"), object: nil)
                         rootVC.tableView.reloadData()
                     } else {
-                        self.stop()
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "PaymentSdkStopSession"), object: nil, userInfo: resultDictionary)
+                        }
                     }
                 })
             } else {
@@ -267,6 +300,11 @@ public class BaseCPFlow: NSObject {
     @objc public var answer: String?
 }
 
+@objc public class UserSystemDetails: NSObject {
+    @objc public var organizationId: String?
+    @objc public var sessionId: String = "s0b500qh"
+}
+
 @objc public class ManualEnrollmentConfiguration: NSObject {
     @objc public var routingNumber: String?
     @objc public var accountNumber: String?
@@ -287,7 +325,19 @@ public class BaseCPFlow: NSObject {
     @objc public var ssn: String?
     @objc public var gender: String?
     @objc public var dob: String?
+    @objc public var pin: String?
+    @objc public var newPin: String?
     @objc public var securityQuestions: [SecurityQuestionConfiguration]?
+    @objc public var genericFlag1: String?
+    @objc public var genericFlag2: String?
+    @objc public var genericFlag3: String?
+    @objc public var genericCode1: String?
+    @objc public var genericCode2: String?
+    @objc public var genericCode3: String?
+    @objc public var reportingField1: String?
+    @objc public var reportingField2: String?
+    @objc public var reportingField3: String?
+    @objc fileprivate var sessionId: String?
 }
 
 @objc public class ManualEnrollment: BaseCPFlow {
@@ -305,20 +355,32 @@ public class BaseCPFlow: NSObject {
         dataDictionary["\(type.rawValue).accountNumber"] = manualEnrollmentConfiguration.accountNumber
         dataDictionary["\(type.rawValue).accountType"] = manualEnrollmentConfiguration.accountType
         dataDictionary["\(type.rawValue).onlineBankTransactionId"] = manualEnrollmentConfiguration.onlineBankTransactionId
-        dataDictionary["\(type.rawValue).cpCardNumber"] = manualEnrollmentConfiguration.cpCardNumber
+        dataDictionary["\(type.rawValue).connectPayPaymentNumber"] = manualEnrollmentConfiguration.cpCardNumber
         dataDictionary["\(type.rawValue).firstName"] = manualEnrollmentConfiguration.firstName
         dataDictionary["\(type.rawValue).lastName"] = manualEnrollmentConfiguration.lastName
         dataDictionary["\(type.rawValue).email"] = manualEnrollmentConfiguration.email
-        dataDictionary["\(type.rawValue).streetAddress"] = manualEnrollmentConfiguration.streetAddress
-        dataDictionary["\(type.rawValue).apartmentNumber"] = manualEnrollmentConfiguration.apartmentNumber
+        dataDictionary["\(type.rawValue).street"] = manualEnrollmentConfiguration.streetAddress
+        dataDictionary["\(type.rawValue).street2"] = manualEnrollmentConfiguration.apartmentNumber
         dataDictionary["\(type.rawValue).city"] = manualEnrollmentConfiguration.city
         dataDictionary["\(type.rawValue).state"] = manualEnrollmentConfiguration.state
-        dataDictionary["\(type.rawValue).zipCode"] = manualEnrollmentConfiguration.zipCode
+        dataDictionary["\(type.rawValue).postalCode"] = manualEnrollmentConfiguration.zipCode
         dataDictionary["\(type.rawValue).driversLicense"] = manualEnrollmentConfiguration.driversLicense
         dataDictionary["\(type.rawValue).driversLicenseIssuingState"] = manualEnrollmentConfiguration.driversLicenseIssuingState
         dataDictionary["\(type.rawValue).ssn"] = manualEnrollmentConfiguration.ssn
         dataDictionary["\(type.rawValue).gender"] = manualEnrollmentConfiguration.gender
         dataDictionary["\(type.rawValue).dob"] = manualEnrollmentConfiguration.dob
+        dataDictionary["\(type.rawValue).organizationId"] = ConfigurationManager.shared.mainScreenConfiguration?.threatmetrix?.orgId
+        dataDictionary["\(type.rawValue).sessionId"] = manualEnrollmentConfiguration.sessionId
+        dataDictionary["\(WidgetType.CPEnrollmentTAndCWidget.rawValue).pin"] = manualEnrollmentConfiguration.pin
+        dataDictionary["\(type.rawValue).genericFlag1"] = manualEnrollmentConfiguration.genericFlag1
+        dataDictionary["\(type.rawValue).genericFlag2"] = manualEnrollmentConfiguration.genericFlag2
+        dataDictionary["\(type.rawValue).genericFlag3"] = manualEnrollmentConfiguration.genericFlag3
+        dataDictionary["\(type.rawValue).genericCode1"] = manualEnrollmentConfiguration.genericCode1
+        dataDictionary["\(type.rawValue).genericCode2"] = manualEnrollmentConfiguration.genericCode2
+        dataDictionary["\(type.rawValue).genericCode3"] = manualEnrollmentConfiguration.genericCode3
+        dataDictionary["\(type.rawValue).reportingField1"] = manualEnrollmentConfiguration.reportingField1
+        dataDictionary["\(type.rawValue).reportingField2"] = manualEnrollmentConfiguration.reportingField2
+        dataDictionary["\(type.rawValue).reportingField3"] = manualEnrollmentConfiguration.reportingField3
         if let phoneNumbers = manualEnrollmentConfiguration.phoneNumbers {
             for phoneIndex in phoneNumbers.indices {
                 let configuration = manualEnrollmentConfiguration.phoneNumbers![phoneIndex]
@@ -355,16 +417,20 @@ public class BaseCPFlow: NSObject {
         dataDictionary["\(type.rawValue).firstName"] = updateEnrollmentConfiguration.firstName
         dataDictionary["\(type.rawValue).lastName"] = updateEnrollmentConfiguration.lastName
         dataDictionary["\(type.rawValue).email"] = updateEnrollmentConfiguration.email
-        dataDictionary["\(type.rawValue).streetAddress"] = updateEnrollmentConfiguration.streetAddress
-        dataDictionary["\(type.rawValue).apartmentNumber"] = updateEnrollmentConfiguration.apartmentNumber
+        dataDictionary["\(type.rawValue).street"] = updateEnrollmentConfiguration.streetAddress
+        dataDictionary["\(type.rawValue).street2"] = updateEnrollmentConfiguration.apartmentNumber
         dataDictionary["\(type.rawValue).city"] = updateEnrollmentConfiguration.city
         dataDictionary["\(type.rawValue).state"] = updateEnrollmentConfiguration.state
-        dataDictionary["\(type.rawValue).zipCode"] = updateEnrollmentConfiguration.zipCode
+        dataDictionary["\(type.rawValue).postalCode"] = updateEnrollmentConfiguration.zipCode
         dataDictionary["\(type.rawValue).driversLicense"] = updateEnrollmentConfiguration.driversLicense
         dataDictionary["\(type.rawValue).driversLicenseIssuingState"] = updateEnrollmentConfiguration.driversLicenseIssuingState
         dataDictionary["\(type.rawValue).ssn"] = updateEnrollmentConfiguration.ssn
         dataDictionary["\(type.rawValue).gender"] = updateEnrollmentConfiguration.gender
         dataDictionary["\(type.rawValue).dob"] = updateEnrollmentConfiguration.dob
+        dataDictionary["\(type.rawValue).pin"] = updateEnrollmentConfiguration.pin
+        dataDictionary["\(type.rawValue).pinNew"] = updateEnrollmentConfiguration.newPin
+        dataDictionary["\(type.rawValue).organizationId"] = ConfigurationManager.shared.mainScreenConfiguration?.threatmetrix?.orgId
+        dataDictionary["\(type.rawValue).sessionId"] = updateEnrollmentConfiguration.sessionId
         if let phoneNumbers = updateEnrollmentConfiguration.phoneNumbers {
             for phoneIndex in phoneNumbers.indices {
                 let configuration = updateEnrollmentConfiguration.phoneNumbers![phoneIndex]
@@ -401,16 +467,19 @@ public class BaseCPFlow: NSObject {
         dataDictionary["\(type.rawValue).firstName"] = enrollmentAccountDetailConfiguration.firstName
         dataDictionary["\(type.rawValue).lastName"] = enrollmentAccountDetailConfiguration.lastName
         dataDictionary["\(type.rawValue).email"] = enrollmentAccountDetailConfiguration.email
-        dataDictionary["\(type.rawValue).streetAddress"] = enrollmentAccountDetailConfiguration.streetAddress
-        dataDictionary["\(type.rawValue).apartmentNumber"] = enrollmentAccountDetailConfiguration.apartmentNumber
+        dataDictionary["\(type.rawValue).street"] = enrollmentAccountDetailConfiguration.streetAddress
+        dataDictionary["\(type.rawValue).street2"] = enrollmentAccountDetailConfiguration.apartmentNumber
         dataDictionary["\(type.rawValue).city"] = enrollmentAccountDetailConfiguration.city
         dataDictionary["\(type.rawValue).state"] = enrollmentAccountDetailConfiguration.state
-        dataDictionary["\(type.rawValue).zipCode"] = enrollmentAccountDetailConfiguration.zipCode
+        dataDictionary["\(type.rawValue).postalCode"] = enrollmentAccountDetailConfiguration.zipCode
         dataDictionary["\(type.rawValue).driversLicense"] = enrollmentAccountDetailConfiguration.driversLicense
         dataDictionary["\(type.rawValue).driversLicenseIssuingState"] = enrollmentAccountDetailConfiguration.driversLicenseIssuingState
         dataDictionary["\(type.rawValue).ssn"] = enrollmentAccountDetailConfiguration.ssn
         dataDictionary["\(type.rawValue).gender"] = enrollmentAccountDetailConfiguration.gender
         dataDictionary["\(type.rawValue).dob"] = enrollmentAccountDetailConfiguration.dob
+        dataDictionary["\(WidgetType.CPEnrollmentTAndCWidget.rawValue).pin"] = enrollmentAccountDetailConfiguration.pin
+        dataDictionary["\(type.rawValue).organizationId"] = ConfigurationManager.shared.mainScreenConfiguration?.threatmetrix?.orgId
+        dataDictionary["\(type.rawValue).sessionId"] = enrollmentAccountDetailConfiguration.sessionId
         if let phoneNumbers = enrollmentAccountDetailConfiguration.phoneNumbers {
             for phoneIndex in phoneNumbers.indices {
                 let configuration = enrollmentAccountDetailConfiguration.phoneNumbers![phoneIndex]
@@ -446,8 +515,18 @@ public class BaseCPFlow: NSObject {
     override func _getDataDictionary(forWidgetType type: WidgetType) -> [String : String]? {
         var dataDictionary = [String:String]()
         dataDictionary["\(type.rawValue).accountNumber"] = manualDepositConfiguration.accountNumber
-        dataDictionary["\(type.rawValue).firstDepositedAmount"] = manualDepositConfiguration.firstDepositedAmount
-        dataDictionary["\(type.rawValue).secondDepositedAmount"] = manualDepositConfiguration.secondDepositedAmount
+        if let firstDepositedAmount = manualDepositConfiguration.firstDepositedAmount, !firstDepositedAmount.contains(".") {
+            let formattedFirstAmount = "0." + String(firstDepositedAmount.prefix(2))
+            dataDictionary["\(type.rawValue).firstDepositedAmount"] = formattedFirstAmount
+        } else {
+            dataDictionary["\(type.rawValue).firstDepositedAmount"] = manualDepositConfiguration.firstDepositedAmount
+        }
+        if let secondDepositedAmount = manualDepositConfiguration.secondDepositedAmount, !secondDepositedAmount.contains(".") {
+            let formattedSecondAmount = "0." + String(secondDepositedAmount.prefix(2))
+            dataDictionary["\(type.rawValue).secondDepositedAmount"] = formattedSecondAmount
+        } else {
+            dataDictionary["\(type.rawValue).secondDepositedAmount"] = manualDepositConfiguration.secondDepositedAmount
+        }
         return dataDictionary
     }
 }
@@ -457,7 +536,7 @@ public class BaseCPFlow: NSObject {
  * Account Validation Flow
  *
  **********************************************************/
-//MARK: Manual Deposit Flow
+//MARK: Account Validation Flow
 @objc public class AccountValidationConfiguration: NSObject {
     @objc public var cpCardNumber: String?
     @objc public var pin: String?

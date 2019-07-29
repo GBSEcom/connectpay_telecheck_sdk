@@ -318,7 +318,18 @@ SWIFT_CLASS("_TtC10PaymentSDK29ManualEnrollmentConfiguration")
 @property (nonatomic, copy) NSString * _Nullable ssn;
 @property (nonatomic, copy) NSString * _Nullable gender;
 @property (nonatomic, copy) NSString * _Nullable dob;
+@property (nonatomic, copy) NSString * _Nullable pin;
+@property (nonatomic, copy) NSString * _Nullable newPin;
 @property (nonatomic, copy) NSArray<SecurityQuestionConfiguration *> * _Nullable securityQuestions;
+@property (nonatomic, copy) NSString * _Nullable genericFlag1;
+@property (nonatomic, copy) NSString * _Nullable genericFlag2;
+@property (nonatomic, copy) NSString * _Nullable genericFlag3;
+@property (nonatomic, copy) NSString * _Nullable genericCode1;
+@property (nonatomic, copy) NSString * _Nullable genericCode2;
+@property (nonatomic, copy) NSString * _Nullable genericCode3;
+@property (nonatomic, copy) NSString * _Nullable reportingField1;
+@property (nonatomic, copy) NSString * _Nullable reportingField2;
+@property (nonatomic, copy) NSString * _Nullable reportingField3;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -351,6 +362,14 @@ SWIFT_CLASS("_TtC10PaymentSDK16UpdateEnrollment")
 @interface UpdateEnrollment : BaseCPFlow
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_DEPRECATED_MSG("-init is unavailable");
+@end
+
+
+SWIFT_CLASS("_TtC10PaymentSDK17UserSystemDetails")
+@interface UserSystemDetails : NSObject
+@property (nonatomic, copy) NSString * _Nullable organizationId;
+@property (nonatomic, copy) NSString * _Nonnull sessionId;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 #if __has_attribute(external_source_symbol)
