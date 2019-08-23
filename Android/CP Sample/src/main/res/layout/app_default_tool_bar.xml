@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/appToolBar"
+    android:layout_width="match_parent"
+    android:layout_height="95dp"
+    android:elevation="4dp"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/str_home_title"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="23sp" />
+
+        <TextView
+            android:id="@+id/toolbar_sub_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:text="@string/str_frag_title_warning"
+            android:textColor="@color/color_warning"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</android.support.v7.widget.Toolbar>
