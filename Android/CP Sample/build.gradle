@@ -4,6 +4,8 @@ buildscript {
     ext.kotlin_version = '1.3.20'
     ext.koin_version = '2.0.0-beta-1'
     ext.dokka_version = '0.9.17'
+    // Document these info
+    ext.nav_version = "1.0.0-beta01"
 
     repositories {
         google()

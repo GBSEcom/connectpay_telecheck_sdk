@@ -81,14 +81,27 @@ dependencies {
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
 
+    // Dependencies for CP-SDK
 
-    // Document these info
-    def nav_version = "1.0.0-beta01"
+    implementation 'com.firstdata.util:library:3.0.11'
 
+    implementation "org.koin:koin-core:$koin_version"
+    implementation "org.koin:koin-core-ext:$koin_version"
+    implementation "org.koin:koin-android:$koin_version"
 
-    api 'com.firstdata.util:library:3.0.11'
-    api "android.arch.navigation:navigation-fragment-ktx:$nav_version"
-    api "android.arch.navigation:navigation-ui-ktx:$nav_version"
+    implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
+    implementation 'org.apache.commons:commons-text:1.6'
+
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+
+    implementation 'com.github.wnameless:json-flattener:0.6.0'
+    implementation 'commons-codec:commons-codec:1.12'
+    // Dependencies for CP-SDK
 }
 
 configurations.all {
