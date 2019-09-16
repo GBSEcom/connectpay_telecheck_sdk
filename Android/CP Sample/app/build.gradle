@@ -1,0 +1,104 @@
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "${CP_SDK_TEST_APPLICATION_ID}"
+        minSdkVersion 23
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0.11.SR30.QA"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "type"
+
+    productFlavors {
+
+        dev {
+            dimension = "type"
+        }
+
+        qa {
+            dimension = "type"
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+
+    kapt {
+        generateStubs = true
+    }
+}
+
+dependencies {
+//    implementation files('libs/common/-utils-3.0.11.jar')
+    implementation files('libs/cpsdk-1.0.2.aar')
+    implementation files('libs/cpsdkexternal-1.0.2.aar')
+    implementation files('libs/paymentsdk-1.0.0.aar')
+
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+//    implementation project(':cpsdkexternal')
+//    implementation project(':cpsdk')
+
+    implementation "org.greenrobot:eventbus:${eventbus_version}"
+
+    //Dagger2
+    implementation "com.google.dagger:dagger:${android_di_dagger_version}"
+    implementation "com.google.dagger:dagger-android-support:${android_di_dagger_version}"
+    //annotationProcessor "com.google.dagger:dagger-compiler:${android_di_dagger_version}"
+    kapt "com.google.dagger:dagger-compiler:${android_di_dagger_version}"
+
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    implementation "com.android.support.constraint:constraint-layout:$ANDROID_CONSTRAINT_LAYOUT_VERSION"
+    implementation "com.android.support:design:$ANDROID_SUPPORT_LIBRARY_VERSION"
+
+    androidTestImplementation 'com.android.support.test.espresso:espresso-web:3.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'design'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+
+
+    // Document these info
+    def nav_version = "1.0.0-beta01"
+
+
+    api 'com.firstdata.util:library:3.0.11'
+    api "android.arch.navigation:navigation-fragment-ktx:$nav_version"
+    api "android.arch.navigation:navigation-ui-ktx:$nav_version"
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'com.android.support' && !details.requested.name.contains('multidex')) {
+            details.useVersion ANDROID_SUPPORT_LIBRARY_VERSION
+        }
+    }
+}
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}

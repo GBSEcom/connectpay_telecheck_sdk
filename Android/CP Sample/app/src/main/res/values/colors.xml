@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <color name="colorPrimary">#B41C1C</color>
+    <color name="colorPrimaryDark">#721212</color>
+    <color name="colorAccent">#B41C1C</color>
+
+    <color name="textColorPrimary">#212529</color>
+    <color name="textColorSecondary">#8c8c8c</color>
+    <color name="textColorDefault">#ffffff</color>
+    <color name="txtColorTitle">#185074</color>
+
+    <color name="color_warning">#B2012A</color>
+
+    <color name="color_circle_selected">#2096F3</color>
+    <color name="color_circle_default">#B2B2B2</color>
+
+    <color name="colorDisabled">#757575</color>
+    <color name="colorPressed">#0D1A6F</color>
+</resources>

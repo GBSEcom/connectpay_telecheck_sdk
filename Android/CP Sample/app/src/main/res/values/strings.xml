@@ -1,0 +1,92 @@
+<resources>
+    <string name="app_name">ConnectPay</string>
+
+    <string name="str_frag_title_session_config">Get Session Token</string>
+    <string name="str_frag_title_use_case">Choose Use Case </string>
+    <string name="str_frag_title_launch_sdk">Launch SDK</string>
+
+    <string name="str_home_title">Welcome to (CP)Payment SDK</string>
+    <string name="str_frag_title_warning">Only for First Data Internal Use.Do not Distribute</string>
+
+
+    <string name="str_env">Environment</string>
+    <string name="str_api_key">API Key \u002A</string>
+    <string name="str_api_sec_key">API Secret Key \u002A</string>
+    <string name="str_url">API End Point \u002A</string>
+    <string name="str_FD_ACC_ID">FD Account ID</string>
+
+    <string name="str_FD_customer_ID">FD Customer ID \u002A</string>
+
+    <string name="str_note"><b>Note:</b> If the account id value is provided token will be generated with account id. Otherwise, token will be generated without account id.</string>
+    <string name="str_generate_token">Generate Token</string>
+    <string name="str_clear_profile">Clear Profile</string>
+    <string name="str_clear_keys">Clear Keys</string>
+
+    <string name="str_common_test">Test String</string>
+    <string name="str_common_success">Success</string>
+    <string name="str_common_failure">Failure</string>
+    <string name="str_common_warning_wait">Please wait &#8230;</string>
+    <string name="str_common_network_error">Network Error. Please check the internet connection!</string>
+
+
+    <string name="str_sdk_error_unknown">Unknown SDK Error</string>
+    <string name="str_sdk_error_user_cancelled">User Cancelled the work flow!</string>
+    <string name="str_sdk_error_sdk_destroyed">CP-SDK Destroyed. Please Initiate the flow from the beginning!</string>
+    <string name="str_sdk_error_config_mismatch">Requested UseCase did not match the type of flow you were attempting to start</string>
+
+    <string name="str_account_validation">Account Validation</string>
+    <string name="str_close_account">Close Account</string>
+    <string name="str_update_enrollment">Update Enrollment</string>
+    <string name="str_bank_only">Bank Only</string>
+    <string name="str_manual_only">Manual Only</string>
+    <string name="str_manual_deposit">Manual Deposit</string>
+    <string name="str_enroll_both_web">Enrollment Both Option [Web]</string>
+    <string name="str_enroll_both_mobile">Enrollment Both Option [Mobile]</string>
+    <string name="str_enroll_acc_detail">Enrollment Account Detail</string>
+    <string name="str_manual_deposit_with_acc_field_">Manual Deposit With Account Field</string>
+
+
+    <string name="str_war_use_case"><b>Note : </b> To see the supported Use Cases, \nPress Generate Token from the Home Screen. </string>
+
+    <string name="str_field_transaction_id">Bank Transaction Id \u002A</string>
+    <string name="str_field_routing_no">Routing Number \u002A</string>
+    <string name="str_field_acc_no">Account Number \u002A</string>
+    <string name="str_field_acc_type">Account Type</string>
+    <string-array name="array_acc_types">
+        <item>Personal</item>
+        <item>Corporate</item>
+    </string-array>
+    <string-array name="array_phone_no_types">
+        <item>Home</item>
+        <item>Mobile</item>
+        <item>Business</item>
+        <item>Mobile</item>
+    </string-array>
+    <string name="str_field_connect_pay_card_no">Connect Pay Card Number</string>
+
+
+    <string name="str_title_user_acc_info">Account</string>
+    <string name="str_title_user_address_info">Address</string>
+
+    <string name="str_field_first_name">First Name</string>
+    <string name="str_field_last_name">Last Name</string>
+    <string name="str_field_phone_no">Phone Number</string>
+    <string name="str_field_phone_type">Phone Type</string>
+    <string name="str_field_email">Email</string>
+    <string name="str_field_street">Street</string>
+    <string name="str_field_city">City</string>
+    <string name="str_field_state">State</string>
+    <string name="str_field_postal_code">Postal Code</string>
+    <string name="str_field_dl_no">Driver License Number</string>
+    <string name="str_field_dl_issue_state">Issuing State</string>
+    <string name="str_field_SSN">SSN</string>
+    <string name="str_field_gender">Gender</string>
+    <string name="str_field_dob">DOB</string>
+
+    <string name="str_field_member_since">Member Since</string>
+    <string name="str_field_sec_question">Security Question</string>
+    <string name="str_field_sec_answer">Security Answer</string>
+    <string name="str_field_pin">Pin</string>
+
+
+</resources>

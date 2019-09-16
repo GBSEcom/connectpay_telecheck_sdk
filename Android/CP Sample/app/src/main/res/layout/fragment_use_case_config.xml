@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableLayout
+            android:id="@+id/dash_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="#ffffff"
+            android:weightSum="4">
+
+            <include
+                android:id="@+id/row_1"
+                layout="@layout/use_case_dashboard_item"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <include
+                android:id="@+id/row_2"
+                layout="@layout/use_case_dashboard_item"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <include
+                android:id="@+id/row_3"
+                layout="@layout/use_case_dashboard_item"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <include
+                android:id="@+id/row_4"
+                layout="@layout/use_case_dashboard_item"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </TableLayout>
+
+
+        <include
+            android:id="@+id/progressContainer"
+            layout="@layout/fd_progress_dialog" />
+
+    </FrameLayout>
+    <!--</ScrollView>-->
+</layout>

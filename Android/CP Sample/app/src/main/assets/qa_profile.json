@@ -1,0 +1,8 @@
+{
+  "fdAccountID": "8a7f6ef76afe7a53016b00b163e6000c",
+  "fdCustomerID": "cc7e40192d3c484085a327b90c550400",
+  "apiKey": "P8uAm7Af2xIOZQvfZCsQy3IJ3oqKpm6l",
+  "secretKey": "QTzAYKHFufFND32H",
+  "catEndPoint": "https://cat.api.firstdata.com",
+  "qaEndPoint": "https://qa.api.firstdata.com"
+}
